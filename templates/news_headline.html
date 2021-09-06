@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %} News Headline Generator {% endblock %}
+
+{% block content %}
+
+
+<div class="jumbotron vertical-center">
+    <div class="container">
+    <form>
+        <div class="input-group">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Paste the news here</span>
+            </div>
+            <textarea class="form-control" id="news" name="news" rows="20" aria-label="Paste the news Here"></textarea>
+        </div>
+        <br>
+        <div class="row">
+            <div class="col text-center">
+                <button type="button"  onclick="GenerateHeadline()" class="btn btn-outline-primary center"> Generate Headline </button>
+            </div>
+        </div>
+    </form>
+</div>
+</div>
+
+<script>
+function GenerateHeadline(){
+
+    news = $('#news').val();
+    if (!news) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'News cannot be empty.',
+        })
+    } else {
+        Swal.fire({
+          text: 'Generating Headline...',
+          width: 350,
+          padding: '3em',
+          imageUrl: "static/images/newspaper.gif",
+          showCancelButton: false,
+          showConfirmButton: false,
+          background: 'white',
+          backdrop: `
+            rgba(0,0,123,0.4)
+            left top
+            no-repeat
+          `
+        })
+        setTimeout(function(){
+            $.ajax({
+              type : 'POST',
+              url : "{{url_for('predict')}}",
+              data: JSON.stringify(news),
+              contentType: "application/json",
+              cache: false,
+              dataType: 'json',
+              success: function(data) {
+                summary = data['summary']
+                Swal.fire({
+                  title: 'News Headline',
+                  text: summary,
+                  width: 800,
+                })
+              }
+            })
+        }, 1500);
+    }
+}
+
+</script>
+
+{% endblock %}
